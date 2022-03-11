@@ -37,6 +37,7 @@
     <Compile Include="ConnectionListener.cs" />
     <Compile Include="WorldManager.cs" />
     <Compile Include="ConnectionManager.cs" />
+    <Compile Include="Connection.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="mudserver.pfx">
