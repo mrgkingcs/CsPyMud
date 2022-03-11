@@ -18,5 +18,10 @@ namespace CsPyMudServer
         {
 
         }
+
+        public void Tick()
+        {
+
+        }
     }
 }

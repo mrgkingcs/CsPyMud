@@ -8,16 +8,21 @@ namespace CsPyMudServer
         private WorldManager worldManager;
         private ConnectionManager connectionManager;
 
+        private static bool ShouldQuit;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="T:CsPyMudServer.Server"/> class.
         /// </summary>
-        public CsPyMudServer() { }
+        public Server() { }
 
         /// <summary>
         /// Set up the network listeners, etc. to get the server going
         /// </summary>
         public void Startup()
         {
+            ShouldQuit = false;
+            Console.CancelKeyPress += delegate { ShouldQuit = true; };
+
             // startup raw connection listener in its own thread 
             // (it will pass off successful SSL connections to ConnectionManager)
             connectionListener = new ConnectionListener(8000);
@@ -47,16 +52,6 @@ namespace CsPyMudServer
         }
 
         /// <summary>
-        /// Used to query if the outer loop should shutdown the server
-        /// </summary>
-        /// <returns><c>true</c>, if the outer loop should shutdown the server 
-        /// <c>false</c> otherwise.</returns>
-        public bool ShouldQuit()
-        {
-            return true;
-        }
-
-        /// <summary>
         /// Called by the main loop so the server can do things without waiting
         /// for a network event
         /// </summary>
@@ -76,7 +71,7 @@ namespace CsPyMudServer
 
             app.Startup();
 
-            while(app.ShouldQuit() == false)
+            while(ShouldQuit == false)
             {
                 app.Tick();
             }

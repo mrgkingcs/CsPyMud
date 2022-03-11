@@ -38,5 +38,10 @@
     <Compile Include="WorldManager.cs" />
     <Compile Include="ConnectionManager.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="mudserver.pfx">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>
