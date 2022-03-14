@@ -38,6 +38,9 @@
     <Compile Include="WorldManager.cs" />
     <Compile Include="ConnectionManager.cs" />
     <Compile Include="Connection.cs" />
+    <Compile Include="Conversation.cs" />
+    <Compile Include="AuthenticationConversation.cs" />
+    <Compile Include="PlayingConversation.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="mudserver.pfx">
