@@ -1,0 +1,17 @@
+
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CsPyMudClient", "CsPyMudClient\CsPyMudClient.csproj", "{FFA354E9-7EC1-4767-B0C0-26335146106A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FFA354E9-7EC1-4767-B0C0-26335146106A}.Debug|x86.ActiveCfg = Debug|x86
+		{FFA354E9-7EC1-4767-B0C0-26335146106A}.Debug|x86.Build.0 = Debug|x86
+		{FFA354E9-7EC1-4767-B0C0-26335146106A}.Release|x86.ActiveCfg = Release|x86
+		{FFA354E9-7EC1-4767-B0C0-26335146106A}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+EndGlobal
