@@ -5,18 +5,24 @@ namespace CsPyMudServer
 {
     public class AuthenticationConversation : Conversation
     {
+        //====================================================================
         // Static password dictionary
         // (i.e. all instances of AuthenticationConversation use the same
         //  pw dictionary)
+        //====================================================================
         private class PwEntry
         {
             public string username;
-            public string salt;
-            public string hashedPw;
+            public string password;
+
+            public PwEntry() { username = password = ""; }
         }
         private static ConcurrentDictionary<string, PwEntry> passwordDB 
             = new ConcurrentDictionary<string, PwEntry>();
 
+        /// <summary>
+        /// Loads the user/password file into the passwordDB dictionary.
+        /// </summary>
         private static void LoadPwFile()
         { 
             passwordDB.Clear();
@@ -24,30 +30,48 @@ namespace CsPyMudServer
             // read password file into dictionary...
         }
 
+        /// <summary>
+        /// Writes the contents of passwordDB into the user/password file
+        /// </summary>
         private static void SavePwFile()
         {
             // write password dictionary into file...
         }
 
-        private static string GetSalt(string username)
+        /// <summary>
+        /// Gets the password from the passwordDB
+        /// (to compare to what the client sends through)
+        /// </summary>
+        /// <returns>The hashed pw.</returns>
+        /// <param name="username">Username.</param>
+        private static string GetPw(string username)
         {
-            return passwordDB[username].salt;    
+            return passwordDB[username].password;
         }
 
-        private static string GetHashedPw(string username)
+
+        //====================================================================
+        // member methods
+        //====================================================================
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:CsPyMudServer.AuthenticationConversation"/> class.
+        /// </summary>
+        /// <param name="_connection">Connection.</param>
+        public AuthenticationConversation(Connection _connection) : base(_connection)
         {
-            return passwordDB[username].hashedPw;
+            IsAuthenticated = false;
+
+
         }
-
-
-        // conversation instance methods
 
         /// <summary>
         /// Called to start off the conversation
         /// </summary>
         public override void Start()
         {
-            throw new NotImplementedException();
+            connection.MessageHandler = this.HandleUsername;
+            connection.SendMessage("USERNAME: ");
         }
 
         /// <summary>
@@ -55,10 +79,7 @@ namespace CsPyMudServer
         /// </summary>
         /// <returns><c>true</c>, if correct username/password has been received 
         /// <c>false</c> otherwise.</returns>
-        public bool IsAuthenticated()
-        {
-            return false;
-        }
+        public bool IsAuthenticated;
 
         /// <summary>
         /// Returns <see langword="true"/> if authentication has failed
@@ -71,5 +92,23 @@ namespace CsPyMudServer
             return false;
         }
 
+        //====================================================================
+        // Message handlers
+        //====================================================================
+        private void HandleUsername(string message)
+        {
+            // need to store the username from the message for checking
+            // password in HandlePassword()
+
+            connection.MessageHandler = this.HandlePassword;
+            connection.SendMessage("PASSWORD: ");
+        }
+
+        private void HandlePassword(string message)
+        {
+            // should probably actually do some checking of the password here...
+
+            IsAuthenticated = true;
+        }
     }
 }

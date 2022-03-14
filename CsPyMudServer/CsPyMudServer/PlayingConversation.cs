@@ -3,13 +3,19 @@ namespace CsPyMudServer
 {
     public class PlayingConversation : Conversation
     {
-        public PlayingConversation()
+        public PlayingConversation(Connection _connection) : base(_connection)
         {
         }
 
         public override void Start()
         {
-            throw new NotImplementedException();
+            connection.SendMessage("Welcome to the dummy server which does nothing!!");
+            connection.MessageHandler = this.Parrot;
+        }
+
+        private void Parrot(string message)
+        {
+            connection.SendMessage(message);
         }
     }
 }

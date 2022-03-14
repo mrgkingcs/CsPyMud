@@ -7,16 +7,16 @@ namespace CsPyMudServer
     public class ConnectionManager
     {
         private ConnectionListener connectionListener;
-        private List<Connection> authenticatingConnections;
-        private List<Connection> playingConnections;
+        private List<AuthenticationConversation> authenticatingConversations;
+        private List<PlayingConversation> playingConversations;
 
         public ConnectionManager(   ConnectionListener _connectionListener,
                                     WorldManager _worldManager
             )
         {
             connectionListener = _connectionListener;
-            authenticatingConnections = new List<Connection>();
-            playingConnections = new List<Connection>();
+            authenticatingConversations = new List<AuthenticationConversation>();
+            playingConversations = new List<PlayingConversation>();
         }
 
         public void Startup()
@@ -31,27 +31,33 @@ namespace CsPyMudServer
 
         public void Tick()
         {
-            // get new connections from connectionListener
+            // get new connections from connectionListener...
+            // ...and kick off Authentication conversations
             Connection newConnection = connectionListener.GetNewConnection();
             while (newConnection != null)
             {
                 Console.WriteLine("New connection from {0}", newConnection.ClientIPAddress);
+
+                AuthenticationConversation conversation = new AuthenticationConversation(newConnection);
+                conversation.Start();
+                authenticatingConversations.Add(conversation);
+
                 newConnection = connectionListener.GetNewConnection();
-                newConnection.CurrentConversation = new AuthenticationConversation();
-                authenticatingConnections.Add(newConnection);
             }
 
-            //foreach(Connection conn in authenticatingConnections)
-            for(int connIndex = authenticatingConnections.Count-1; connIndex >= 0; connIndex--)
+            // loop through all Authentication conversations...
+            for (int connIndex = authenticatingConversations.Count-1; connIndex >= 0; connIndex--)
             {
-                Connection conn = authenticatingConnections[connIndex];
-                AuthenticationConversation conv = (AuthenticationConversation)conn.CurrentConversation;
-                if (conv.IsAuthenticated())
+                AuthenticationConversation conv = authenticatingConversations[connIndex];
+                // ...and if authentication has finished...
+                if (conv.IsAuthenticated)
                 {
-                    authenticatingConnections.RemoveAt(connIndex);
+                    // ...transfer them over to Playing conversations
+                    authenticatingConversations.RemoveAt(connIndex);
 
-                    conn.CurrentConversation = new PlayingConversation();
-                    playingConnections.Add(conn);
+                    PlayingConversation newConversation = new PlayingConversation(conv.Connection);
+                    newConversation.Start();
+                    playingConversations.Add(newConversation);
                 }
             }
         }

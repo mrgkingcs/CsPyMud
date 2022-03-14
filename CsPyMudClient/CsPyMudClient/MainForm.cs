@@ -98,31 +98,26 @@ namespace CsPyMudClient
             inputTextBox.Text = "";
 
             // send command through connection
-
+            connection.SendMessage(command);
 
             // echo command to output
             outputBox.SelectionFont = new Font("Courier New", 12, FontStyle.Regular);
             outputBox.SelectionColor = Color.DarkGray;
-            outputBox.AppendText("> "+command+"\n");
+            outputBox.AppendText("> "+command+ Environment.NewLine);
         }
 
-        public int ReceiveMessage(string text)
+        public void ReceiveMessage(string text)
         {
-            string[] lines = text.Split('\n');
             outputBox.SelectionFont = new Font("Courier New", 12, FontStyle.Bold);
             outputBox.SelectionColor = Color.Black;
-            foreach (string line in lines)
-            {
-                outputBox.AppendText(line + "\n");
-            }
-            return 0;
+            outputBox.AppendText(text + Environment.NewLine);
         }
 
         private void InternalMessage(string text)
         {
             outputBox.SelectionFont = new Font("Courier New", 12, FontStyle.Underline);
             outputBox.SelectionColor = Color.Red;
-            outputBox.AppendText(text + "\n");
+            outputBox.AppendText(text + Environment.NewLine);
         }
 
         //=====================================================================
