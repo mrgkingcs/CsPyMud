@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -6,6 +7,27 @@ namespace CsPyMudClient
 {
     public class MainForm : Form
     {
+        // text style stuff
+        private enum MessageStyle
+        {
+            INTERNAL,
+            REMOTE,
+            LOCAL
+        }
+
+        class MessageStyleDef
+        {
+            public MessageStyleDef(string fontName, FontStyle fontStyle, Color _color)
+            {
+                font = new Font(fontName, 12, fontStyle);
+                color = _color;
+            }
+            public Font font;
+            public Color color;
+        }
+
+        private Dictionary<MessageStyle, MessageStyleDef> messageStyles;
+
         // GUI stuffs
         private TableLayoutPanel topLayout;
         private RichTextBox outputBox;
@@ -18,9 +40,24 @@ namespace CsPyMudClient
 
         public MainForm()
         {
+            InitStyles();
             BuildComponents();
         }
 
+        /// <summary>
+        /// Set up the styles dictionary for later use
+        /// </summary>
+        private void InitStyles()
+        {
+            messageStyles = new Dictionary<MessageStyle, MessageStyleDef>();
+            messageStyles.Add(MessageStyle.INTERNAL, new MessageStyleDef("Courier New", FontStyle.Bold, Color.Red));
+            messageStyles.Add(MessageStyle.REMOTE, new MessageStyleDef("Courier New", FontStyle.Regular, Color.Black));
+            messageStyles.Add(MessageStyle.LOCAL, new MessageStyleDef("Courier New", FontStyle.Italic, Color.DarkGray));
+        }
+
+        /// <summary>
+        /// Set up the controls in the main form
+        /// </summary>
         private void BuildComponents()
         {
             topLayout = new TableLayoutPanel();
@@ -83,6 +120,11 @@ namespace CsPyMudClient
         //=====================================================================
         // Controller methods
         //=====================================================================
+
+        /// <summary>
+        /// Callback to if check key press is an ENTER 
+        /// </summary>
+        /// <param name="keyCode">Key code.</param>
         private void CheckForEnter(Keys keyCode)
         {
             if(keyCode == Keys.Enter)
@@ -91,6 +133,12 @@ namespace CsPyMudClient
             }
         }
 
+        // use a delegate to execute AppendText later from main thread
+        private delegate void MsgDelegate();
+
+        /// <summary>
+        /// Send the command currently in the inputTextBox
+        /// </summary>
         private void SendCommand()
         {
             // collect input and reset input text box
@@ -100,24 +148,41 @@ namespace CsPyMudClient
             // send command through connection
             connection.SendMessage(command);
 
-            // echo command to output
-            outputBox.SelectionFont = new Font("Courier New", 12, FontStyle.Regular);
-            outputBox.SelectionColor = Color.DarkGray;
-            outputBox.AppendText("> "+command+ Environment.NewLine);
+            string message = "> " + command + Environment.NewLine;
+            Invoke(new MsgDelegate(() => AppendText(MessageStyle.LOCAL, message)));
         }
 
+        /// <summary>
+        /// Add the received message to the output display
+        /// </summary>
+        /// <param name="text">Text.</param>
         public void ReceiveMessage(string text)
         {
-            outputBox.SelectionFont = new Font("Courier New", 12, FontStyle.Bold);
-            outputBox.SelectionColor = Color.Black;
-            outputBox.AppendText(text + Environment.NewLine);
+            string message = text + Environment.NewLine;
+            Invoke(new MsgDelegate(() => AppendText(MessageStyle.REMOTE, message)));
         }
 
+        /// <summary>
+        /// Display the message from the client's internal gubbins
+        /// </summary>
+        /// <param name="text">Text.</param>
         private void InternalMessage(string text)
         {
-            outputBox.SelectionFont = new Font("Courier New", 12, FontStyle.Underline);
-            outputBox.SelectionColor = Color.Red;
-            outputBox.AppendText(text + Environment.NewLine);
+            string message = text + Environment.NewLine;
+            Invoke(new MsgDelegate(() => AppendText(MessageStyle.INTERNAL, message)));
+        }
+
+        /// <summary>
+        /// This is meant to be used in a delegate so that the main thread can
+        /// update the output display in a thread-safe manner
+        /// </summary>
+        /// <param name="style">Style.</param>
+        /// <param name="message">Message.</param>
+        private void AppendText(MessageStyle style, string message)
+        {
+            outputBox.SelectionFont = messageStyles[style].font;
+            outputBox.SelectionColor = messageStyles[style].color;
+            outputBox.AppendText(message);
         }
 
         //=====================================================================
