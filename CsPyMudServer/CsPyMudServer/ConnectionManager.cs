@@ -8,6 +8,7 @@ namespace CsPyMudServer
     {
         private ConnectionListener connectionListener;
         private List<AuthenticationConversation> authenticatingConversations;
+        private List<CharacterSelectConversation> charSelectConversations;
         private List<PlayingConversation> playingConversations;
 
         public ConnectionManager(   ConnectionListener _connectionListener,
@@ -16,6 +17,7 @@ namespace CsPyMudServer
         {
             connectionListener = _connectionListener;
             authenticatingConversations = new List<AuthenticationConversation>();
+            charSelectConversations = new List<CharacterSelectConversation>();
             playingConversations = new List<PlayingConversation>();
         }
 
@@ -55,11 +57,30 @@ namespace CsPyMudServer
                     // ...transfer them over to Playing conversations
                     authenticatingConversations.RemoveAt(connIndex);
 
+                    CharacterSelectConversation newConversation = new CharacterSelectConversation(conv.Connection);
+                    newConversation.Start();
+                    charSelectConversations.Add(newConversation);
+                }
+            }
+
+            // loop through all Character Select conversations...
+            // (feels like there should be a better way of doing this...)
+            for (int connIndex = charSelectConversations.Count - 1; connIndex >= 0; connIndex--)
+            {
+                CharacterSelectConversation conv = charSelectConversations[connIndex];
+                // ...and if authentication has finished...
+                if (conv.chosenCharacter != CharacterSelectConversation.INVALID_CHAR)
+                {
+                    // ...transfer them over to Playing conversations
+                    charSelectConversations.RemoveAt(connIndex);
+
                     PlayingConversation newConversation = new PlayingConversation(conv.Connection);
+                    newConversation.player.CharName = conv.GetCharName();
                     newConversation.Start();
                     playingConversations.Add(newConversation);
                 }
             }
+
         }
     }
 }

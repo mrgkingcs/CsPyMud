@@ -41,6 +41,8 @@
     <Compile Include="Conversation.cs" />
     <Compile Include="AuthenticationConversation.cs" />
     <Compile Include="PlayingConversation.cs" />
+    <Compile Include="CharacterSelectConversation.cs" />
+    <Compile Include="PlayerStatus.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="mudserver.pfx">
