@@ -67,7 +67,7 @@ namespace CsPyMudServer
             {
                 MessageHandler(Encoding.ASCII.GetString(readBuffer, 0, byteCount));
             }
-            sslStream.BeginRead(readBuffer, 0, 4096, (asyncResult) => this.ForwardIncomingMessage(asyncResult), this);
+            sslStream.BeginRead(readBuffer, 0, READ_BUFFER_SIZE, (asyncResult) => this.ForwardIncomingMessage(asyncResult), this);
         }
     }
 }

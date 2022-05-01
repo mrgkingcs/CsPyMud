@@ -5,7 +5,8 @@ namespace CsPyMudServer
     {
         public PlayerStatus player;
 
-        public PlayingConversation(MessageStream _connection) : base(_connection)
+        public PlayingConversation(MessageStream _connection, CompleteHandler _handler)
+            : base(_connection, _handler)
         {
             player = new PlayerStatus();
         }
@@ -20,6 +21,10 @@ namespace CsPyMudServer
         private void Parrot(string message)
         {
             connection.SendMessage(message);
+            if(message == "exit")
+            {
+                completeHandler(this);
+            }
         }
     }
 }

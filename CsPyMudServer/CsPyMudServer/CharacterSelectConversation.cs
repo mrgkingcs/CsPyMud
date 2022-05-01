@@ -8,8 +8,8 @@ namespace CsPyMudServer
 
         public int chosenCharacter;
 
-        public CharacterSelectConversation(MessageStream _connection)
-            : base(_connection)
+        public CharacterSelectConversation(MessageStream _connection, CompleteHandler _handler)
+            : base(_connection, _handler)
         {
             chosenCharacter = INVALID_CHAR;
         }
@@ -55,6 +55,7 @@ namespace CsPyMudServer
             else
             {
                 chosenCharacter = choice;
+                completeHandler(this);
             }
         }
     }

@@ -5,11 +5,15 @@ namespace CsPyMudServer
 {
     public abstract class Conversation
     {
-        protected MessageStream connection;
+        public delegate void CompleteHandler(Conversation conversation);
 
-        public Conversation(MessageStream _connection)
+        protected MessageStream connection;
+        protected CompleteHandler completeHandler;
+
+        public Conversation(MessageStream _connection, CompleteHandler handler)
         {
             connection = _connection;
+            completeHandler = handler;
         }
 
         public MessageStream Connection { get { return connection; } }

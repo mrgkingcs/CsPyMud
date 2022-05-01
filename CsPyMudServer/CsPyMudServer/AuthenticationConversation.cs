@@ -58,11 +58,10 @@ namespace CsPyMudServer
         /// Initializes a new instance of the <see cref="T:CsPyMudServer.AuthenticationConversation"/> class.
         /// </summary>
         /// <param name="_connection">Connection.</param>
-        public AuthenticationConversation(MessageStream _connection) : base(_connection)
+        public AuthenticationConversation(MessageStream _connection, CompleteHandler _handler) 
+            : base(_connection, _handler)
         {
             IsAuthenticated = false;
-
-
         }
 
         /// <summary>
@@ -81,16 +80,16 @@ namespace CsPyMudServer
         /// <c>false</c> otherwise.</returns>
         public bool IsAuthenticated;
 
-        /// <summary>
-        /// Returns <see langword="true"/> if authentication has failed
-        /// (i.e. too many failed attempts)
-        /// </summary>
-        /// <returns><c>true</c>, if username/password authentication has failed,
-        /// <c>false</c> otherwise.</returns>
-        public bool IsFailed()
-        {
-            return false;
-        }
+        ///// <summary>
+        ///// Returns <see langword="true"/> if authentication has failed
+        ///// (i.e. too many failed attempts)
+        ///// </summary>
+        ///// <returns><c>true</c>, if username/password authentication has failed,
+        ///// <c>false</c> otherwise.</returns>
+        //public bool IsFailed()
+        //{
+        //    return false;
+        //}
 
         //====================================================================
         // Message handlers
@@ -107,8 +106,9 @@ namespace CsPyMudServer
         private void HandlePassword(string message)
         {
             // should probably actually do some checking of the password here...
-
+            connection.SendMessage("Login successful.");
             IsAuthenticated = true;
+            completeHandler(this);
         }
     }
 }
