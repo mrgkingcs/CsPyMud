@@ -35,7 +35,7 @@ namespace CsPyMudServer
         {
             // get new connections from connectionListener...
             // ...and kick off Authentication conversations
-            Connection newConnection = connectionListener.GetNewConnection();
+            MessageStream newConnection = connectionListener.GetNewConnection();
             while (newConnection != null)
             {
                 Console.WriteLine("New connection from {0}", newConnection.ClientIPAddress);

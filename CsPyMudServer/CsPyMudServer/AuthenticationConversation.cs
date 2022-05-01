@@ -58,7 +58,7 @@ namespace CsPyMudServer
         /// Initializes a new instance of the <see cref="T:CsPyMudServer.AuthenticationConversation"/> class.
         /// </summary>
         /// <param name="_connection">Connection.</param>
-        public AuthenticationConversation(Connection _connection) : base(_connection)
+        public AuthenticationConversation(MessageStream _connection) : base(_connection)
         {
             IsAuthenticated = false;
 

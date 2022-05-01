@@ -5,14 +5,14 @@ namespace CsPyMudServer
 {
     public abstract class Conversation
     {
-        protected Connection connection;
+        protected MessageStream connection;
 
-        public Conversation(Connection _connection)
+        public Conversation(MessageStream _connection)
         {
             connection = _connection;
         }
 
-        public Connection Connection { get { return connection; } }
+        public MessageStream Connection { get { return connection; } }
         public abstract void Start();
     }
 }

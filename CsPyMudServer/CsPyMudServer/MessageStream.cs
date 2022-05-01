@@ -10,7 +10,7 @@ namespace CsPyMudServer
     /// <summary>
     /// Class to translate string messages into binary stream messages
     /// </summary>
-    public class Connection
+    public class MessageStream
     {
         private const int READ_BUFFER_SIZE = 4096; 
 
@@ -24,7 +24,7 @@ namespace CsPyMudServer
         /// </summary>
         /// <param name="_stream">Stream.</param>
         /// <param name="_clientAddress">Client address.</param>
-        public Connection(SslStream _stream, IPAddress _clientAddress)
+        public MessageStream(SslStream _stream, IPAddress _clientAddress)
         {
             sslStream = _stream;
             clientAddress = _clientAddress;

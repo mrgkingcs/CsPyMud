@@ -16,7 +16,7 @@ namespace CsPyMudServer
         Thread listenerThread;
         X509Certificate serverCertificate = null;
 
-        ConcurrentQueue<Connection> newConnectionStreams;
+        ConcurrentQueue<MessageStream> newConnectionStreams;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:CsPyMudServer.ConnectionListener"/> class.
@@ -27,7 +27,7 @@ namespace CsPyMudServer
             byte[] certData = File.ReadAllBytes("mudserver.pfx");
             serverCertificate = new X509Certificate(certData, "bumbum");
 
-            newConnectionStreams = new ConcurrentQueue<Connection>();
+            newConnectionStreams = new ConcurrentQueue<MessageStream>();
 
             listener = new TcpListener(IPAddress.Any, _listenPort);
             listenerThread = new Thread(this.ListenForConnections);
@@ -50,7 +50,7 @@ namespace CsPyMudServer
             listenerThread.Abort();
             listener.Stop();
 
-            Connection connection = GetNewConnection();
+            MessageStream connection = GetNewConnection();
             while(connection != null)
             {
                 connection.Close();
@@ -62,9 +62,9 @@ namespace CsPyMudServer
         /// Gets a new connection which has had SSL encryption set up.
         /// </summary>
         /// <returns>The new connection, or null.</returns>
-        public Connection GetNewConnection()
+        public MessageStream GetNewConnection()
         {
-            Connection result = null;
+            MessageStream result = null;
 
             newConnectionStreams.TryDequeue(out result);
 
@@ -99,7 +99,7 @@ namespace CsPyMudServer
                     sslStream.ReadTimeout = 5000;
                     sslStream.WriteTimeout = 5000;
 
-                    Connection newConnection = new Connection(sslStream, address);
+                    MessageStream newConnection = new MessageStream(sslStream, address);
 
                     newConnectionStreams.Enqueue(newConnection);
                 }

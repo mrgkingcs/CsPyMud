@@ -8,7 +8,7 @@ namespace CsPyMudServer
 
         public int chosenCharacter;
 
-        public CharacterSelectConversation(Connection _connection)
+        public CharacterSelectConversation(MessageStream _connection)
             : base(_connection)
         {
             chosenCharacter = INVALID_CHAR;

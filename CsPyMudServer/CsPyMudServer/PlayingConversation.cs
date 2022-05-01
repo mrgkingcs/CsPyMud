@@ -5,7 +5,7 @@ namespace CsPyMudServer
     {
         public PlayerStatus player;
 
-        public PlayingConversation(Connection _connection) : base(_connection)
+        public PlayingConversation(MessageStream _connection) : base(_connection)
         {
             player = new PlayerStatus();
         }
