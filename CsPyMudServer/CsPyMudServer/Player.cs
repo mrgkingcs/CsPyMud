@@ -1,10 +1,8 @@
 ﻿using System;
 namespace CsPyMudServer
 {
-    public class Player : Character
+    public class Player
     {
-
-       
-
+        public Character character;
     }
 }

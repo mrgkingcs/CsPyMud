@@ -77,6 +77,7 @@ namespace CsPyMudServer
         /// </summary>
         private void ListenForConnections()
         {
+            Console.WriteLine("Listening for connections");
             while(true)
             {
                 // blocks waiting for connection
@@ -110,7 +111,7 @@ namespace CsPyMudServer
                     {
                         Console.WriteLine("Inner exception: {0}", e.InnerException.Message);
                     }
-                    Console.WriteLine("Authentication failed - closing the connection.");
+                    Console.WriteLine("SSL authentication failed - closing the connection.");
                     sslStream.Close();
                     client.Close();
                 }

@@ -50,7 +50,7 @@ namespace CsPyMudServer
                 // for username/password
                 AuthenticationConversation conversation =
                     new AuthenticationConversation(
-                        incomingStream,
+                        newConnection,
                         (conv) => this.HandleAuthenticationComplete(newConnection)
                     );
                 newConnection.Conversation = conversation;
@@ -75,7 +75,7 @@ namespace CsPyMudServer
             {
                 CharacterSelectConversation newConv =
                     new CharacterSelectConversation(
-                        connection.MessageStream,
+                        connection,
                         (conv) => this.HandleCharacterSelectComplete(connection)
                     );
 
@@ -97,15 +97,19 @@ namespace CsPyMudServer
             CharacterSelectConversation charSelConv =
                 (CharacterSelectConversation)connection.Conversation;
 
+            // for now, just create an empty character with the chosen name.
+            // should really load character from some kind of database...
+            Player currPlayer = new Player();
+            currPlayer.character = new Character();
+            currPlayer.character.name = charSelConv.GetCharName();
+            connection.SetData("PLAYER", currPlayer);
+
             PlayingConversation newConv =
                 new PlayingConversation(
-                    connection.MessageStream,
+                    connection,
                     (conv) => this.HandlePlayingComplete(connection)
                 );
 
-            // set the character name on the new conversation
-            // (should this be data stored in the Connection?)
-            newConv.player.CharName = charSelConv.GetCharName();
 
             connection.Conversation = newConv;
         }

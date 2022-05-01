@@ -73,6 +73,7 @@ namespace CsPyMudClient
             outputBox.BackColor = Color.White;
             outputBox.Multiline = true;
             outputBox.TabStop = false;
+            outputBox.Click += (sender, e) => this.ActiveControl = inputTextBox;
             topLayout.Controls.Add(outputBox, 0, 0);
 
             inputLayout = new TableLayoutPanel();

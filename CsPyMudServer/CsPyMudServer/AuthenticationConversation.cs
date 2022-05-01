@@ -58,7 +58,7 @@ namespace CsPyMudServer
         /// Initializes a new instance of the <see cref="T:CsPyMudServer.AuthenticationConversation"/> class.
         /// </summary>
         /// <param name="_connection">Connection.</param>
-        public AuthenticationConversation(MessageStream _connection, CompleteHandler _handler) 
+        public AuthenticationConversation(Connection _connection, CompleteHandler _handler) 
             : base(_connection, _handler)
         {
             IsAuthenticated = false;
@@ -69,8 +69,8 @@ namespace CsPyMudServer
         /// </summary>
         public override void Start()
         {
-            connection.MessageHandler = this.HandleUsername;
-            connection.SendMessage("USERNAME: ");
+            Stream.MessageHandler = this.HandleUsername;
+            Stream.SendMessage("USERNAME: ");
         }
 
         /// <summary>
@@ -99,14 +99,14 @@ namespace CsPyMudServer
             // need to store the username from the message for checking
             // password in HandlePassword()
 
-            connection.MessageHandler = this.HandlePassword;
-            connection.SendMessage("PASSWORD: ");
+            Stream.MessageHandler = this.HandlePassword;
+            Stream.SendMessage("PASSWORD: ");
         }
 
         private void HandlePassword(string message)
         {
             // should probably actually do some checking of the password here...
-            connection.SendMessage("Login successful.");
+            Stream.SendMessage("Login successful.");
             IsAuthenticated = true;
             completeHandler(this);
         }

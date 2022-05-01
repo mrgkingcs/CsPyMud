@@ -8,7 +8,7 @@ namespace CsPyMudServer
 
         public int chosenCharacter;
 
-        public CharacterSelectConversation(MessageStream _connection, CompleteHandler _handler)
+        public CharacterSelectConversation(Connection _connection, CompleteHandler _handler)
             : base(_connection, _handler)
         {
             chosenCharacter = INVALID_CHAR;
@@ -37,24 +37,25 @@ namespace CsPyMudServer
             }
             message += "\nEnter your choice:\n";
 
-            connection.SendMessage(message);
-            connection.MessageHandler = this.CheckCharacterChoice;
+            Stream.SendMessage(message);
+            Stream.MessageHandler = this.CheckCharacterChoice;
         }
 
         public void CheckCharacterChoice(string message)
         {
             int choice = -1;
             if(!int.TryParse(message.Trim(), out choice)) {
-                connection.SendMessage("You must enter a number.\n");
+                Stream.SendMessage("You must enter a number.\n");
                 AskWhichCharacter();
-            } else if (choice < 0 || choice >= charNames.Length)
+            } else if (choice <= 0 || choice > charNames.Length)
             {
-                connection.SendMessage("That is not an allowed number.\n");
+                Stream.SendMessage("That is not an allowed number.\n");
                 AskWhichCharacter();
             }
             else
             {
-                chosenCharacter = choice;
+                chosenCharacter = choice-1;
+                Stream.SendMessage(String.Format("You selected {0}.", charNames[chosenCharacter]));
                 completeHandler(this);
             }
         }
