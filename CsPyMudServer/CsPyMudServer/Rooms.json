@@ -1,0 +1,14 @@
+﻿{
+    "StartRoom" : { 
+        "Description" : "The room is a small cube with glossy white walls.  The ceiling and floor are black, with white luminous squares in the centre.",
+        "Exits": { "North": "Room1",  "South": "Room2" }
+    },
+    "Room1" : {
+        "Description" : "This room has polished blue walls, with a luminous '1' embedded in the ceiling.",
+        "Exits": { "South": "StartRoom" }
+    },
+    "Room2" : {
+        "Description" : "This room has polished red walls, with a luminous '2' embedded in the ceiling.",
+        "Exits": { "North": "StartRoom" }
+    }
+}

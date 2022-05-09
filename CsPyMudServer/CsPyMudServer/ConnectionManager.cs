@@ -7,21 +7,16 @@ namespace CsPyMudServer
     public class ConnectionManager
     {
         private ConnectionListener connectionListener;
+        private WorldManager worldManager;
         private List<Connection> connectionList;
-
-        //private List<AuthenticationConversation> authenticatingConversations;
-        //private List<CharacterSelectConversation> charSelectConversations;
-        //private List<PlayingConversation> playingConversations;
 
         public ConnectionManager(ConnectionListener _connectionListener,
                                     WorldManager _worldManager
             )
         {
             connectionListener = _connectionListener;
+            worldManager = _worldManager;
             connectionList = new List<Connection>();
-            //authenticatingConversations = new List<AuthenticationConversation>();
-            //charSelectConversations = new List<CharacterSelectConversation>();
-            //playingConversations = new List<PlayingConversation>();
         }
 
         public void Startup()
@@ -107,7 +102,8 @@ namespace CsPyMudServer
             PlayingConversation newConv =
                 new PlayingConversation(
                     connection,
-                    (conv) => this.HandlePlayingComplete(connection)
+                    (conv) => this.HandlePlayingComplete(connection),
+                    worldManager
                 );
 
 
