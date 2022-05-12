@@ -60,10 +60,12 @@ namespace CsPyMudClient
         /// </summary>
         private void BuildComponents()
         {
+            this.MinimumSize = new Size(640, 480);
+
             topLayout = new TableLayoutPanel();
             topLayout.Dock = DockStyle.Fill;
-            topLayout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-            topLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 24));
+            topLayout.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+            topLayout.RowStyles.Add(new RowStyle(SizeType.Absolute, 36));
 
             this.Controls.Add(topLayout);
 
@@ -78,13 +80,15 @@ namespace CsPyMudClient
 
             inputLayout = new TableLayoutPanel();
             inputLayout.Dock = DockStyle.Fill;
-            inputLayout.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
+            inputLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
             inputLayout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 64));
             topLayout.Controls.Add(inputLayout, 0, 1);
 
             inputTextBox = new TextBox();
             inputTextBox.Dock = DockStyle.Fill;
-            inputTextBox.KeyDown += (sender, e) => CheckForEnter(e.KeyCode);
+            //inputTextBox.KeyDown += (sender, e) => { e.Handled = true; CheckForEnter(e.KeyCode); };
+            inputTextBox.KeyPress += (sender, e) => { CheckForEnter(e); };
+
             inputLayout.Controls.Add(inputTextBox, 0, 0);
 
             sendButton = new Button();
@@ -126,10 +130,11 @@ namespace CsPyMudClient
         /// Callback to if check key press is an ENTER 
         /// </summary>
         /// <param name="keyCode">Key code.</param>
-        private void CheckForEnter(Keys keyCode)
+        private void CheckForEnter(KeyPressEventArgs e)
         {
-            if(keyCode == Keys.Enter)
+            if(e.KeyChar == (char)Keys.Return)
             {
+                e.Handled = true;
                 SendCommand();
             }
         }
@@ -143,14 +148,17 @@ namespace CsPyMudClient
         private void SendCommand()
         {
             // collect input and reset input text box
-            string command = inputTextBox.Text;
+            string command = inputTextBox.Text.Trim();
             inputTextBox.Text = "";
 
-            // send command through connection
-            connection.SendMessage(command);
+            if (command != "")
+            {
+                // send command through connection
+                connection.SendMessage(command);
 
-            string message = "> " + command + Environment.NewLine;
-            Invoke(new MsgDelegate(() => AppendText(MessageStyle.LOCAL, message)));
+                string message = "> " + command + Environment.NewLine;
+                Invoke(new MsgDelegate(() => AppendText(MessageStyle.LOCAL, message)));
+            }
         }
 
         /// <summary>
@@ -181,9 +189,14 @@ namespace CsPyMudClient
         /// <param name="message">Message.</param>
         private void AppendText(MessageStyle style, string message)
         {
+            outputBox.SelectionStart = outputBox.TextLength;
             outputBox.SelectionFont = messageStyles[style].font;
             outputBox.SelectionColor = messageStyles[style].color;
             outputBox.AppendText(message);
+
+            // force scroll
+            outputBox.SelectionStart = outputBox.TextLength;
+            outputBox.ScrollToCaret();
         }
 
         //=====================================================================

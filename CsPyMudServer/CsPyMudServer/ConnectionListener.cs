@@ -14,7 +14,7 @@ namespace CsPyMudServer
     {
         TcpListener listener;
         Thread listenerThread;
-        X509Certificate serverCertificate = null;
+        X509Certificate2 serverCertificate = null;
 
         ConcurrentQueue<MessageStream> newConnectionStreams;
 
@@ -24,8 +24,12 @@ namespace CsPyMudServer
         /// <param name="_listenPort">Listen port.</param>
         public ConnectionListener(int _listenPort)
         {
-            byte[] certData = File.ReadAllBytes("mudserver.pfx");
-            serverCertificate = new X509Certificate(certData, "bumbum");
+            byte[] certData = File.ReadAllBytes("CsPyMudServer.pfx");
+            serverCertificate = new X509Certificate2(certData, "bumbum", X509KeyStorageFlags.PersistKeySet | X509KeyStorageFlags.UserKeySet | X509KeyStorageFlags.Exportable);
+            var store = new X509Store(StoreName.My, StoreLocation.CurrentUser);
+            store.Open(OpenFlags.ReadWrite);
+            store.Add(serverCertificate);
+            store.Close();
 
             newConnectionStreams = new ConcurrentQueue<MessageStream>();
 
@@ -91,9 +95,10 @@ namespace CsPyMudServer
                 SslStream sslStream = new SslStream(client.GetStream(), false);
                 try
                 {
-                    sslStream.AuthenticateAsServer( serverCertificate, 
-                                                    clientCertificateRequired: false, 
-                                                    checkCertificateRevocation: true
+                    sslStream.AuthenticateAsServer(serverCertificate,
+                                                    clientCertificateRequired: false,
+                                                    SslProtocols.Default,
+                                                    checkCertificateRevocation: false
                                                 );
 
                     // Set timeouts for the read and write to 5 seconds.

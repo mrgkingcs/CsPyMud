@@ -18,6 +18,7 @@ namespace CsPyMudServer
         private IPAddress clientAddress;
 
         private byte[] readBuffer = new byte[READ_BUFFER_SIZE];
+        private int numReadBytes = 0;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:CsPyMudServer.Connection"/> class.
@@ -53,7 +54,7 @@ namespace CsPyMudServer
         /// <param name="message">Message.</param>
         public void SendMessage(string message)
         {
-            sslStream.Write(Encoding.ASCII.GetBytes(message));
+            sslStream.Write(Encoding.ASCII.GetBytes(message+'\0'));
         }
 
         /// <summary>
@@ -62,12 +63,54 @@ namespace CsPyMudServer
         /// <param name="result">Result.</param>
         private void ForwardIncomingMessage(IAsyncResult result)
         {
-            int byteCount = sslStream.EndRead(result);
-            if (byteCount > 0 && MessageHandler != null)
+            if (sslStream != null)
             {
-                MessageHandler(Encoding.ASCII.GetString(readBuffer, 0, byteCount));
+                try
+                {
+                    int byteCount = sslStream.EndRead(result);
+                    if (byteCount > 0 && MessageHandler != null)
+                    {
+                        numReadBytes += byteCount;
+
+                        int messageEndIndex = FindMessageEndChar();
+
+                        if (messageEndIndex != -1)
+                        {
+                            MessageHandler(Encoding.ASCII.GetString(readBuffer, 0, messageEndIndex));
+                            int numToCopy = (numReadBytes - messageEndIndex) - 1;
+                            if (numToCopy > 0)
+                            {
+                                int srcIndex = messageEndIndex + 1;
+                                for (int dstIndex = 0; dstIndex < numToCopy; dstIndex++, srcIndex++)
+                                {
+                                    readBuffer[dstIndex] = readBuffer[srcIndex];
+                                }
+                            }
+                            numReadBytes = numToCopy;
+                        }
+                        sslStream.BeginRead(
+                                readBuffer,
+                                numReadBytes,
+                                4096 - numReadBytes,
+                                (asyncResult) => this.ForwardIncomingMessage(asyncResult),
+                                this
+                            );
+                    }
+                }
+                catch (Exception) { }
             }
-            sslStream.BeginRead(readBuffer, 0, READ_BUFFER_SIZE, (asyncResult) => this.ForwardIncomingMessage(asyncResult), this);
+        }
+
+        private int FindMessageEndChar()
+        {
+            for (int index = 0; index < numReadBytes; index++)
+            {
+                if (readBuffer[index] == 0)
+                {
+                    return index;
+                }
+            }
+            return -1;
         }
     }
 }
